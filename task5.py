@@ -1,5 +1,4 @@
 import uuid
-
 import networkx as nx
 import matplotlib.pyplot as plt
 from collections import deque
@@ -32,20 +31,23 @@ def draw_tree(tree_root, traversal_path):
     pos = {tree_root.id: (0, 0)}
     tree = add_edges(tree, tree_root, pos)
 
-    # Визначення кольорів для кожного вузла згідно з порядком обходу
-    node_colors = {node_val: node_color for node_val, node_color in traversal_path}
+    node_colors = {}
+    for i, (node_val, _) in enumerate(traversal_path):
+        color_intensity = 240 - i * 15 
+        color = "#{:02x}{:02x}{:02x}".format(0x12, 0x96, color_intensity)
+        node_colors[node_val] = color
 
-    colors = [node_colors.get(node[1]['label'], 'skyblue') for node in tree.nodes(data=True)]
-    labels = {node[0]: node[1]['label'] for node in tree.nodes(data=True)}  # Використання значень вузлів для міток
+    colors = [node_colors[node[1]['label']] for node in tree.nodes(data=True)]
+    labels = {node[0]: node[1]['label'] for node in tree.nodes(data=True)}
 
     plt.figure(figsize=(8, 5))
     nx.draw(tree, pos=pos, labels=labels, arrows=False, node_size=2500, node_color=colors)
     plt.show()
 
-def dfs(node, color='#1296F0'):
+def dfs(node):
     if node is None:
         return []
-    stack = [(node, color)]
+    stack = [(node, '#1296F0')]
     path = []
     while stack:
         curr_node, curr_color = stack.pop()
@@ -56,10 +58,10 @@ def dfs(node, color='#1296F0'):
             stack.append((curr_node.left, lighter_color(curr_color)))
     return path
 
-def bfs(node, color='#1296F0'):
+def bfs(node):
     if node is None:
         return []
-    queue = deque([(node, color)])
+    queue = deque([(node, '#1296F0')])
     path = []
     while queue:
         curr_node, curr_color = queue.popleft()
