@@ -2,6 +2,7 @@ import uuid
 
 import networkx as nx
 import matplotlib.pyplot as plt
+import heapq
 
 class Node:
     def __init__(self, key, color="skyblue"):
@@ -38,29 +39,27 @@ def draw_tree(tree_root):
     nx.draw(tree, pos=pos, labels=labels, arrows=False, node_size=2500, node_color=colors)
     plt.show()
 
-# Створення дерева
-root = Node(0)
-root.left = Node(4)
-root.left.left = Node(5)
-root.left.right = Node(10)
-root.right = Node(1)
-root.right.left = Node(3)
+def build_heap_tree(heap_array):
+    heap_root = None
 
-# Відображення дерева
-draw_tree(root)
+    def build_heap(node, idx):
+        nonlocal heap_root
+        if idx < len(heap_array):
+            node = Node(heap_array[idx])
+            heap_root = node
+            node.left = build_heap(node.left, 2 * idx + 1)
+            node.right = build_heap(node.right, 2 * idx + 2)
+        return node
 
-# Візуалізація бінарної купи
-def build_heap_tree (heap_root):
-    heap = nx.DiGraph()
-    pos = {heap_root.id: (0, 0)}
-    heap = add_edges(heap, heap_root, pos)
+    heap_root = build_heap(heap_root, 0)
+    return heap_root
 
-    colors = [node[1]['color'] for node in heap.nodes(data=True)]
-    labels = {node[0]: node[1]['label'] for node in heap.nodes(data=True)}  # Використовуйте значення вузла для міток
+# Бінарна купа у вигляді масиву
+heap_array = [0, 4, 10, 5, 3, 1]
+heapq.heapify(heap_array)
 
-    plt.figure(figsize=(8, 5))
-    nx.draw(heap, pos=pos, labels=labels, arrows=False, node_size=2500, node_color=colors)
-    plt.show()
+# Побудова дерева з купи
+heap_tree_root = build_heap_tree(heap_array)
 
-# Створення бінарної купи
-build_heap_tree(root)
+# Відображення бінарної купи з дерева
+draw_tree(heap_tree_root)
